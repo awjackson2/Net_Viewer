@@ -1,6 +1,9 @@
 # Net Viewer
 
 A 3D/2D interactive electrode visualization tool built with React and Three.js. This application allows users to view and interact with electrode networks in both 3D space and 2D projections.
+![2D_Map](https://github.com/user-attachments/assets/bac5a9ef-0f38-47f3-a67f-42055708d814)
+![3D_Map](https://github.com/user-attachments/assets/ebd6078a-5665-414d-bc12-064471e75662)
+![Multi_Electrode_Connections](https://github.com/user-attachments/assets/36856df4-a824-4f5e-85ee-4eb640ca0ecd)
 
 ## Features
 
