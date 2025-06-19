@@ -8,8 +8,36 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 export function startThreeViewer(electrodeState) {
   // ───── Scene Setup ─────
   const container = document.getElementById('three-container');
-  const width = container.clientWidth;
-  const height = container.clientHeight;
+  
+  // Helper function to get current container dimensions
+  function getContainerDimensions() {
+    const rect = container.getBoundingClientRect();
+    return {
+      width: rect.width,
+      height: rect.height,
+      left: rect.left,
+      top: rect.top
+    };
+  }
+  
+  // Ensure container is ready before initializing
+  if (!container) {
+    console.error('Three.js container not found');
+    return;
+  }
+  
+  // Get initial dimensions
+  const initialDims = getContainerDimensions();
+  const width = initialDims.width;
+  const height = initialDims.height;
+  
+  // Ensure we have valid dimensions
+  if (width <= 0 || height <= 0) {
+    console.warn('Container has invalid initial dimensions, retrying...');
+    // Retry after a short delay to allow for layout completion
+    setTimeout(() => startThreeViewer(electrodeState), 100);
+    return;
+  }
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000);
@@ -396,11 +424,13 @@ export function startThreeViewer(electrodeState) {
   let lastMousePosition = { x: 0, y: 0 };
   let movementThreshold = 5;
   let mouseDown = false;
+  
   function onMouseDown(event) {
     isDragging = false;
     mouseDown = true;
     lastMousePosition = { x: event.clientX, y: event.clientY };
   }
+  
   function onMouseMove(event) {
     if (!mouseDown) return;
     const dx = event.clientX - lastMousePosition.x;
@@ -411,12 +441,32 @@ export function startThreeViewer(electrodeState) {
     }
     lastMousePosition = { x: event.clientX, y: event.clientY };
   }
+  
   function onMouseUp(event) {
     mouseDown = false;
     if (!isDragging) {
-      const rect = container.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / height) * 2 + 1;
+      // Get the container's current dimensions and position
+      const containerDims = getContainerDimensions();
+      
+      // Ensure we have valid dimensions
+      if (containerDims.width <= 0 || containerDims.height <= 0) {
+        console.warn('Container has invalid dimensions:', containerDims);
+        return;
+      }
+      
+      // Calculate mouse position relative to the container's actual rendered size
+      // This accounts for any scaling, zoom, or resolution differences
+      const relativeX = (event.clientX - containerDims.left) / containerDims.width;
+      const relativeY = (event.clientY - containerDims.top) / containerDims.height;
+      
+      // Clamp values to ensure they're within bounds
+      const clampedX = Math.max(0, Math.min(1, relativeX));
+      const clampedY = Math.max(0, Math.min(1, relativeY));
+      
+      // Convert to Three.js normalized device coordinates (-1 to 1)
+      mouse.x = clampedX * 2 - 1;
+      mouse.y = -(clampedY * 2 - 1);
+      
       raycaster.setFromCamera(mouse, camera);
       raycaster.near = 0.1;
       raycaster.far = 1000;
@@ -468,11 +518,19 @@ export function startThreeViewer(electrodeState) {
 
   // Resize
   window.addEventListener('resize', () => {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
+    const containerDims = getContainerDimensions();
+    const width = containerDims.width;
+    const height = containerDims.height;
+    
+    // Ensure we have valid dimensions
+    if (width > 0 && height > 0) {
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+      
+      // Force a re-render to ensure everything is properly updated
+      renderer.render(scene, camera);
+    }
   });
 
   updateStatus();

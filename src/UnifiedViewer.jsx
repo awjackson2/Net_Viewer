@@ -38,13 +38,26 @@ export default function UnifiedViewer({ electrodeState }) {
   // Label visibility state
   const [showAllLabels, setShowAllLabels] = useState(true);
 
+  // Dynamic height state
+  const [dynamicHeight, setDynamicHeight] = useState(440);
+
   // Constants for 2D layout
   const WIDTH = 440;
   const HEIGHT = 440;
-  const CENTER_X = WIDTH / 2;
-  const CENTER_Y = HEIGHT / 2;
   const DOT_RADIUS = 7.5;
   const DRAG_THRESHOLD = 5; // pixels
+
+  // Calculate dynamic height based on screen size
+  const calculateDynamicHeight = () => {
+    const screenHeight = window.innerHeight;
+    const availableHeight = screenHeight - 40; // Account for top/bottom margins
+    const minHeight = 200; // Minimum height for each SVG
+    const maxHeight = Math.min(HEIGHT, (availableHeight - 120) / 2); // Account for other UI elements
+    return Math.max(minHeight, maxHeight);
+  };
+
+  const CENTER_X = WIDTH / 2;
+  const CENTER_Y = dynamicHeight / 2;
 
   // Load electrode coordinates from 3D projection
   useEffect(() => {
@@ -101,6 +114,19 @@ export default function UnifiedViewer({ electrodeState }) {
     };
     window.addEventListener('availableElectrodesUpdate', handleAvailableElectrodes);
     return () => window.removeEventListener('availableElectrodesUpdate', handleAvailableElectrodes);
+  }, []);
+
+  // Handle window resize for dynamic height calculation
+  useEffect(() => {
+    const handleResize = () => {
+      setDynamicHeight(calculateDynamicHeight());
+    };
+    
+    // Set initial height
+    setDynamicHeight(calculateDynamicHeight());
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // --- 3D Projection Map Zoom and Pan Handlers ---
@@ -710,7 +736,7 @@ export default function UnifiedViewer({ electrodeState }) {
         top: 20,
         right: 20,
         width: WIDTH,
-        height: HEIGHT * 2 + 80 + (searchError ? 40 : 0),
+        maxHeight: 'calc(100vh - 40px)', // Ensure it doesn't exceed screen height
         background: 'rgba(255,255,255,0.92)',
         border: '1px solid #d1d5db',
         borderRadius: 8,
@@ -720,7 +746,27 @@ export default function UnifiedViewer({ electrodeState }) {
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
+        overflow: 'auto', // Allow scrolling if content is too tall
+        scrollbarWidth: 'thin', // For Firefox
+        scrollbarColor: 'rgba(0,0,0,0.3) transparent', // For Firefox
       }}>
+        <style>
+          {`
+            div::-webkit-scrollbar {
+              width: 8px;
+            }
+            div::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            div::-webkit-scrollbar-thumb {
+              background: rgba(0,0,0,0.3);
+              border-radius: 4px;
+            }
+            div::-webkit-scrollbar-thumb:hover {
+              background: rgba(0,0,0,0.5);
+            }
+          `}
+        </style>
         {/* Search Bar */}
         <div style={{ 
           display: 'flex', 
@@ -841,7 +887,7 @@ export default function UnifiedViewer({ electrodeState }) {
         <svg 
           ref={svgRef}
           width={WIDTH} 
-          height={HEIGHT}
+          height={dynamicHeight}
           style={{ 
             cursor: dragging ? 'grabbing' : 'grab',
             userSelect: 'none',
@@ -941,7 +987,7 @@ export default function UnifiedViewer({ electrodeState }) {
         <svg 
           ref={jsonSvgRef}
           width={WIDTH} 
-          height={HEIGHT}
+          height={dynamicHeight}
           style={{ 
             border: '1px solid #ddd', 
             borderRadius: '4px',
