@@ -84,6 +84,14 @@
         <div class="group-display E2minus">E2-: <span class="electrodes"></span></div>
       </div>
       <div id="status"></div>
+      <div id="combinations-counter" style="margin-top: 10px; padding: 8px; background: rgba(255, 105, 180, 0.1); border: 1px solid rgba(255, 105, 180, 0.3); border-radius: 4px;">
+        <div style="font-weight: bold; color: #d63384; margin-bottom: 4px;">Combinations:</div>
+        <div id="combinations-display" style="font-size: 11px; color: #666;">
+          Red ↔ Green: <span id="red-green-count">0</span><br>
+          Blue ↔ Yellow: <span id="blue-yellow-count">0</span><br>
+          <strong>Total: <span id="total-combinations">0</span></strong>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

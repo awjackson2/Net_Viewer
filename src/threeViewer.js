@@ -81,6 +81,9 @@ export function startThreeViewer(electrodeState) {
   const resetButton = document.getElementById('resetButton');
   const statusDiv = document.getElementById('status');
   const groupDisplays = document.querySelectorAll('.group-display .electrodes');
+  const redGreenCountSpan = document.getElementById('red-green-count');
+  const blueYellowCountSpan = document.getElementById('blue-yellow-count');
+  const totalCombinationsSpan = document.getElementById('total-combinations');
 
   // Update status display
   function updateStatus() {
@@ -89,6 +92,28 @@ export function startThreeViewer(electrodeState) {
     electrodeState.selectedGroups.forEach((group, index) => {
       groupDisplays[index].textContent = group.map(e => e.name).join(', ');
     });
+    updateCombinationsCounter();
+  }
+
+  // Update combinations counter
+  function updateCombinationsCounter() {
+    // Calculate Red ↔ Green (Group 0 ↔ Group 1)
+    const redCount = electrodeState.selectedGroups[0] ? electrodeState.selectedGroups[0].length : 0;
+    const greenCount = electrodeState.selectedGroups[1] ? electrodeState.selectedGroups[1].length : 0;
+    const redGreenCombinations = redCount * greenCount;
+
+    // Calculate Blue ↔ Yellow (Group 2 ↔ Group 3)  
+    const blueCount = electrodeState.selectedGroups[2] ? electrodeState.selectedGroups[2].length : 0;
+    const yellowCount = electrodeState.selectedGroups[3] ? electrodeState.selectedGroups[3].length : 0;
+    const blueYellowCombinations = blueCount * yellowCount;
+
+    // Total combinations
+    const totalCombinations = redGreenCombinations + blueYellowCombinations;
+
+    // Update the display
+    if (redGreenCountSpan) redGreenCountSpan.textContent = redGreenCombinations;
+    if (blueYellowCountSpan) blueYellowCountSpan.textContent = blueYellowCombinations;
+    if (totalCombinationsSpan) totalCombinationsSpan.textContent = totalCombinations;
   }
 
   // Handle group size change
@@ -105,6 +130,7 @@ export function startThreeViewer(electrodeState) {
     electrodeState.currentGroup = 0;
     electrodeState.combinations = [];
     updateStatus();
+    updateCombinationsCounter();
     clickableElectrodes.forEach(electrode => {
       if (electrode.userData.originalMaterial) {
         electrode.material = electrode.userData.originalMaterial;
@@ -271,6 +297,9 @@ export function startThreeViewer(electrodeState) {
 
   // ───── Group Lines ─────
   const groupLines = [[], [], [], []];
+  // Inter-group lines array to store grey lines between specific group pairs
+  const interGroupLines = [];
+  
   function updateGroupLines() {
     electrodeState.selectedGroups.forEach((group, groupIndex) => {
       const lineArray = groupLines[groupIndex];
@@ -322,6 +351,95 @@ export function startThreeViewer(electrodeState) {
         }
       }
     });
+    
+    // ───── Inter-Group Lines (Grey) ─────
+    // Clear existing inter-group lines
+    interGroupLines.forEach(line => scene.remove(line));
+    interGroupLines.length = 0;
+    
+    // Helper function to get electrode centers for a group
+    const getElectrodeCenters = (group) => {
+      const centers = [];
+      group.forEach((electrode) => {
+        if (!electrode || !electrode.pieces || !Array.isArray(electrode.pieces)) return;
+        const center = new THREE.Vector3();
+        let validPieces = 0;
+        electrode.pieces.forEach((piece) => {
+          if (!piece || typeof piece.getWorldPosition !== 'function') return;
+          const worldPos = new THREE.Vector3();
+          piece.getWorldPosition(worldPos);
+          if (!isNaN(worldPos.x) && !isNaN(worldPos.y) && !isNaN(worldPos.z) &&
+              isFinite(worldPos.x) && isFinite(worldPos.y) && isFinite(worldPos.z)) {
+            center.add(worldPos);
+            validPieces++;
+          }
+        });
+        if (validPieces > 0) {
+          center.divideScalar(validPieces);
+          if (!isNaN(center.x) && !isNaN(center.y) && !isNaN(center.z) &&
+              isFinite(center.x) && isFinite(center.y) && isFinite(center.z)) {
+            centers.push(center);
+          }
+        }
+      });
+      return centers;
+    };
+    
+    // Grey lines between Group 0 (red) ↔ Group 1 (green)
+    if (electrodeState.selectedGroups[0] && electrodeState.selectedGroups[1] && 
+        electrodeState.selectedGroups[0].length > 0 && electrodeState.selectedGroups[1].length > 0) {
+      const group0Centers = getElectrodeCenters(electrodeState.selectedGroups[0]);
+      const group1Centers = getElectrodeCenters(electrodeState.selectedGroups[1]);
+      
+      group0Centers.forEach(center1 => {
+        group1Centers.forEach(center2 => {
+          if (center1 && center2) {
+            const geometry = new LineGeometry();
+            const material = new LineMaterial({
+              color: 0xff69b4, // Pink color
+              transparent: true,
+              opacity: 0.8,
+              linewidth: 0.015,
+              worldUnits: true,
+              alphaToCoverage: true
+            });
+            const positions = [center1.x, center1.y, center1.z, center2.x, center2.y, center2.z];
+            geometry.setPositions(positions);
+            const line = new Line2(geometry, material);
+            scene.add(line);
+            interGroupLines.push(line);
+          }
+        });
+      });
+    }
+    
+    // Grey lines between Group 2 (blue) ↔ Group 3 (yellow)
+    if (electrodeState.selectedGroups[2] && electrodeState.selectedGroups[3] && 
+        electrodeState.selectedGroups[2].length > 0 && electrodeState.selectedGroups[3].length > 0) {
+      const group2Centers = getElectrodeCenters(electrodeState.selectedGroups[2]);
+      const group3Centers = getElectrodeCenters(electrodeState.selectedGroups[3]);
+      
+      group2Centers.forEach(center1 => {
+        group3Centers.forEach(center2 => {
+          if (center1 && center2) {
+            const geometry = new LineGeometry();
+            const material = new LineMaterial({
+              color: 0xff69b4, // Pink color
+              transparent: true,
+              opacity: 0.8,
+              linewidth: 0.015,
+              worldUnits: true,
+              alphaToCoverage: true
+            });
+            const positions = [center1.x, center1.y, center1.z, center2.x, center2.y, center2.z];
+            geometry.setPositions(positions);
+            const line = new Line2(geometry, material);
+            scene.add(line);
+            interGroupLines.push(line);
+          }
+        });
+      });
+    }
   }
 
   // Function to find electrode by name (E001, E002, etc.)

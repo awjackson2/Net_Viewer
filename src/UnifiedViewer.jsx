@@ -899,6 +899,7 @@ export default function UnifiedViewer({ electrodeState }) {
           }}
         >
           <g transform={`translate(${CENTER_X + offset.x},${CENTER_Y + offset.y}) scale(${zoom})`}>
+            {/* Lines within groups */}
             {electrodeState.selectedGroups.map((group, groupIndex) =>
               group.map((dot, dotIndex) =>
                 group.slice(dotIndex + 1).map((otherDot, otherIndex) => {
@@ -919,6 +920,50 @@ export default function UnifiedViewer({ electrodeState }) {
                 })
               )
             ).flat(2)}
+            
+            {/* Grey lines between group pairs: Group 0 (red) ↔ Group 1 (green) */}
+            {electrodeState.selectedGroups[0] && electrodeState.selectedGroups[1] && 
+              electrodeState.selectedGroups[0].map((dot1, dot1Index) =>
+                electrodeState.selectedGroups[1].map((dot2, dot2Index) => {
+                  const electrode1 = dots.find(d => d.name === dot1.name);
+                  const electrode2 = dots.find(d => d.name === dot2.name);
+                  if (electrode1 && electrode2) {
+                    return (
+                      <line key={`inter-group-0-1-${dot1Index}-${dot2Index}`}
+                        x1={electrode1.x - CENTER_X} 
+                        y1={electrode1.y - CENTER_Y} 
+                        x2={electrode2.x - CENTER_X} 
+                        y2={electrode2.y - CENTER_Y}
+                        stroke="rgba(255, 105, 180, 0.8)" 
+                        strokeWidth="2" />
+                    );
+                  }
+                  return null;
+                })
+              ).flat()
+            }
+            
+            {/* Grey lines between group pairs: Group 2 (blue) ↔ Group 3 (yellow) */}
+            {electrodeState.selectedGroups[2] && electrodeState.selectedGroups[3] && 
+              electrodeState.selectedGroups[2].map((dot1, dot1Index) =>
+                electrodeState.selectedGroups[3].map((dot2, dot2Index) => {
+                  const electrode1 = dots.find(d => d.name === dot1.name);
+                  const electrode2 = dots.find(d => d.name === dot2.name);
+                  if (electrode1 && electrode2) {
+                    return (
+                      <line key={`inter-group-2-3-${dot1Index}-${dot2Index}`}
+                        x1={electrode1.x - CENTER_X} 
+                        y1={electrode1.y - CENTER_Y} 
+                        x2={electrode2.x - CENTER_X} 
+                        y2={electrode2.y - CENTER_Y}
+                        stroke="rgba(255, 105, 180, 0.8)" 
+                        strokeWidth="2" />
+                    );
+                  }
+                  return null;
+                })
+              ).flat()
+            }
             {dots.map((dot) => (
               <g key={dot.id} onClick={(e) => handleDotClick(dot, dragging)}>
                 <circle 
@@ -999,6 +1044,7 @@ export default function UnifiedViewer({ electrodeState }) {
           }}
         >
           <g transform={`translate(${CENTER_X + jsonOffset.x},${CENTER_Y + jsonOffset.y}) scale(${jsonZoom})`}>
+            {/* Lines within groups */}
             {electrodeState.selectedGroups.map((group, groupIndex) =>
               group.map((dot, dotIndex) =>
                 group.slice(dotIndex + 1).map((otherDot, otherIndex) => {
@@ -1019,6 +1065,50 @@ export default function UnifiedViewer({ electrodeState }) {
                 })
               )
             ).flat(2)}
+            
+            {/* Grey lines between group pairs: Group 0 (red) ↔ Group 1 (green) */}
+            {electrodeState.selectedGroups[0] && electrodeState.selectedGroups[1] && 
+              electrodeState.selectedGroups[0].map((dot1, dot1Index) =>
+                electrodeState.selectedGroups[1].map((dot2, dot2Index) => {
+                  const electrode1 = jsonDots.find(d => d.name === dot1.name);
+                  const electrode2 = jsonDots.find(d => d.name === dot2.name);
+                  if (electrode1 && electrode2) {
+                    return (
+                      <line key={`json-inter-group-0-1-${dot1Index}-${dot2Index}`}
+                        x1={electrode1.x - CENTER_X} 
+                        y1={electrode1.y - CENTER_Y} 
+                        x2={electrode2.x - CENTER_X} 
+                        y2={electrode2.y - CENTER_Y}
+                        stroke="rgba(255, 105, 180, 0.8)" 
+                        strokeWidth="2" />
+                    );
+                  }
+                  return null;
+                })
+              ).flat()
+            }
+            
+            {/* Grey lines between group pairs: Group 2 (blue) ↔ Group 3 (yellow) */}
+            {electrodeState.selectedGroups[2] && electrodeState.selectedGroups[3] && 
+              electrodeState.selectedGroups[2].map((dot1, dot1Index) =>
+                electrodeState.selectedGroups[3].map((dot2, dot2Index) => {
+                  const electrode1 = jsonDots.find(d => d.name === dot1.name);
+                  const electrode2 = jsonDots.find(d => d.name === dot2.name);
+                  if (electrode1 && electrode2) {
+                    return (
+                      <line key={`json-inter-group-2-3-${dot1Index}-${dot2Index}`}
+                        x1={electrode1.x - CENTER_X} 
+                        y1={electrode1.y - CENTER_Y} 
+                        x2={electrode2.x - CENTER_X} 
+                        y2={electrode2.y - CENTER_Y}
+                        stroke="rgba(255, 105, 180, 0.8)" 
+                        strokeWidth="2" />
+                    );
+                  }
+                  return null;
+                })
+              ).flat()
+            }
             {jsonDots.map((dot) => (
               <g key={`json-${dot.id}`} onClick={(e) => handleDotClick(dot, jsonDragging)}>
                 <circle 
@@ -1153,6 +1243,7 @@ export default function UnifiedViewer({ electrodeState }) {
                   borderRadius: '4px'
                 }}
               >
+                {/* Lines within groups */}
                 {electrodeState.selectedGroups.map((group, groupIndex) =>
                   group.map((dot, dotIndex) =>
                     group.slice(dotIndex + 1).map((otherDot, otherIndex) => {
@@ -1173,6 +1264,50 @@ export default function UnifiedViewer({ electrodeState }) {
                     })
                   )
                 ).flat(2)}
+                
+                {/* Grey lines between group pairs: Group 0 (red) ↔ Group 1 (green) */}
+                {electrodeState.selectedGroups[0] && electrodeState.selectedGroups[1] && 
+                  electrodeState.selectedGroups[0].map((dot1, dot1Index) =>
+                    electrodeState.selectedGroups[1].map((dot2, dot2Index) => {
+                      const electrode1 = dots.find(d => d.name === dot1.name);
+                      const electrode2 = dots.find(d => d.name === dot2.name);
+                      if (electrode1 && electrode2) {
+                        return (
+                                                     <line key={`fullscreen-inter-group-0-1-${dot1Index}-${dot2Index}`}
+                             x1={electrode1.x} 
+                             y1={electrode1.y} 
+                             x2={electrode2.x} 
+                             y2={electrode2.y}
+                             stroke="rgba(255, 105, 180, 0.8)" 
+                             strokeWidth="2" />
+                        );
+                      }
+                      return null;
+                    })
+                  ).flat()
+                }
+                
+                {/* Grey lines between group pairs: Group 2 (blue) ↔ Group 3 (yellow) */}
+                {electrodeState.selectedGroups[2] && electrodeState.selectedGroups[3] && 
+                  electrodeState.selectedGroups[2].map((dot1, dot1Index) =>
+                    electrodeState.selectedGroups[3].map((dot2, dot2Index) => {
+                      const electrode1 = dots.find(d => d.name === dot1.name);
+                      const electrode2 = dots.find(d => d.name === dot2.name);
+                      if (electrode1 && electrode2) {
+                        return (
+                                                     <line key={`fullscreen-inter-group-2-3-${dot1Index}-${dot2Index}`}
+                             x1={electrode1.x} 
+                             y1={electrode1.y} 
+                             x2={electrode2.x} 
+                             y2={electrode2.y}
+                             stroke="rgba(255, 105, 180, 0.8)" 
+                             strokeWidth="2" />
+                        );
+                      }
+                      return null;
+                    })
+                  ).flat()
+                }
                 {dots.map((dot) => (
                   <g key={dot.id} onClick={(e) => handleDotClick(dot, dragging)}>
                     <circle 
@@ -1285,6 +1420,7 @@ export default function UnifiedViewer({ electrodeState }) {
                   msUserSelect: 'none'
                 }}
               >
+                {/* Lines within groups */}
                 {electrodeState.selectedGroups.map((group, groupIndex) =>
                   group.map((dot, dotIndex) =>
                     group.slice(dotIndex + 1).map((otherDot, otherIndex) => {
@@ -1305,6 +1441,50 @@ export default function UnifiedViewer({ electrodeState }) {
                     })
                   )
                 ).flat(2)}
+                
+                {/* Grey lines between group pairs: Group 0 (red) ↔ Group 1 (green) */}
+                {electrodeState.selectedGroups[0] && electrodeState.selectedGroups[1] && 
+                  electrodeState.selectedGroups[0].map((dot1, dot1Index) =>
+                    electrodeState.selectedGroups[1].map((dot2, dot2Index) => {
+                      const electrode1 = jsonDots.find(d => d.name === dot1.name);
+                      const electrode2 = jsonDots.find(d => d.name === dot2.name);
+                      if (electrode1 && electrode2) {
+                        return (
+                                                     <line key={`fullscreen-json-inter-group-0-1-${dot1Index}-${dot2Index}`}
+                             x1={electrode1.x} 
+                             y1={electrode1.y} 
+                             x2={electrode2.x} 
+                             y2={electrode2.y}
+                             stroke="rgba(255, 105, 180, 0.8)" 
+                             strokeWidth="2" />
+                        );
+                      }
+                      return null;
+                    })
+                  ).flat()
+                }
+                
+                {/* Grey lines between group pairs: Group 2 (blue) ↔ Group 3 (yellow) */}
+                {electrodeState.selectedGroups[2] && electrodeState.selectedGroups[3] && 
+                  electrodeState.selectedGroups[2].map((dot1, dot1Index) =>
+                    electrodeState.selectedGroups[3].map((dot2, dot2Index) => {
+                      const electrode1 = jsonDots.find(d => d.name === dot1.name);
+                      const electrode2 = jsonDots.find(d => d.name === dot2.name);
+                      if (electrode1 && electrode2) {
+                        return (
+                                                     <line key={`fullscreen-json-inter-group-2-3-${dot1Index}-${dot2Index}`}
+                             x1={electrode1.x} 
+                             y1={electrode1.y} 
+                             x2={electrode2.x} 
+                             y2={electrode2.y}
+                             stroke="rgba(255, 105, 180, 0.8)" 
+                             strokeWidth="2" />
+                        );
+                      }
+                      return null;
+                    })
+                  ).flat()
+                }
                 {jsonDots.map((dot) => (
                   <g key={`json-${dot.id}`} onClick={(e) => handleDotClick(dot, jsonDragging)}>
                     <circle 
