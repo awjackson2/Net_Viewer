@@ -108,7 +108,7 @@ export function startThreeViewer(electrodeState) {
     const blueYellowCombinations = blueCount * yellowCount;
 
     // Total combinations
-    const totalCombinations = redGreenCombinations + blueYellowCombinations;
+    const totalCombinations = redGreenCombinations * blueYellowCombinations;
 
     // Update the display
     if (redGreenCountSpan) redGreenCountSpan.textContent = redGreenCombinations;
