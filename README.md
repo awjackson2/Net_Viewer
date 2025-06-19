@@ -48,7 +48,7 @@ Net_Viewer/
 
 1. Clone the repository:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/awjackson2/Net_Viewer.git
    cd Net_Viewer
    ```
 
