@@ -1121,7 +1121,7 @@ export default function UnifiedViewer({ electrodeState }) {
                 marginBottom: '10px'
               }}>
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
-                  3D Projection (Live) - Fullscreen
+                  3D Map - Fullscreen
                 </h3>
                 <button
                   onClick={toggle3DProjectionFullscreen}
@@ -1253,7 +1253,7 @@ export default function UnifiedViewer({ electrodeState }) {
                 marginBottom: '10px'
               }}>
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
-                  JSON Reference (Interactive) - Fullscreen
+                  2D Map - Fullscreen
                 </h3>
                 <button
                   onClick={toggleJsonReferenceFullscreen}
