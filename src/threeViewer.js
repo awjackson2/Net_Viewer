@@ -296,63 +296,63 @@ export function startThreeViewer(electrodeState) {
   });
 
   // ───── Group Lines ─────
-  const groupLines = [[], [], [], []];
-  // Inter-group lines array to store grey lines between specific group pairs
+  // Inter-group lines array to store pink lines between specific group pairs
   const interGroupLines = [];
   
   function updateGroupLines() {
-    electrodeState.selectedGroups.forEach((group, groupIndex) => {
-      const lineArray = groupLines[groupIndex];
-      const centers = [];
-      group.forEach((electrode) => {
-        if (!electrode || !electrode.pieces || !Array.isArray(electrode.pieces)) return;
-        const center = new THREE.Vector3();
-        let validPieces = 0;
-        electrode.pieces.forEach((piece) => {
-          if (!piece || typeof piece.getWorldPosition !== 'function') return;
-          const worldPos = new THREE.Vector3();
-          piece.getWorldPosition(worldPos);
-          if (!isNaN(worldPos.x) && !isNaN(worldPos.y) && !isNaN(worldPos.z) &&
-              isFinite(worldPos.x) && isFinite(worldPos.y) && isFinite(worldPos.z)) {
-            center.add(worldPos);
-            validPieces++;
-          }
-        });
-        if (validPieces > 0) {
-          center.divideScalar(validPieces);
-          if (!isNaN(center.x) && !isNaN(center.y) && !isNaN(center.z) &&
-              isFinite(center.x) && isFinite(center.y) && isFinite(center.z)) {
-            centers.push(center);
-          }
-        }
-      });
-      lineArray.forEach(line => scene.remove(line));
-      lineArray.length = 0;
-      for (let i = 0; i < centers.length; i++) {
-        for (let j = i + 1; j < centers.length; j++) {
-          const center1 = centers[i];
-          const center2 = centers[j];
-          if (center1 && center2) {
-            const geometry = new LineGeometry();
-            const material = new LineMaterial({
-              color: getGroupColor(groupIndex),
-              transparent: true,
-              opacity: 1,
-              linewidth: 0.02,
-              worldUnits: true,
-              alphaToCoverage: true
-            });
-            const positions = [center1.x, center1.y, center1.z, center2.x, center2.y, center2.z];
-            geometry.setPositions(positions);
-            const line = new Line2(geometry, material);
-            scene.add(line);
-            lineArray.push(line);
-          }
-        }
-      }
-    });
+    // Remove the colored inter-group lines - only keep pink combination lines
+    // electrodeState.selectedGroups.forEach((group, groupIndex) => {
+    //   const lineArray = groupLines[groupIndex];
+    //   const centers = [];
+    //   group.forEach((electrode) => {
+    //     if (!electrode || !electrode.pieces || !Array.isArray(electrode.pieces)) return;
+    //     const center = new THREE.Vector3();
+    //     let validPieces = 0;
+    //     electrode.pieces.forEach((piece) => {
+    //       if (!piece || typeof piece.getWorldPosition !== 'function') return;
+    //       const worldPos = new THREE.Vector3();
+    //       piece.getWorldPosition(worldPos);
+    //       if (!isNaN(worldPos.x) && !isNaN(worldPos.y) && !isNaN(worldPos.z) &&
+    //           isFinite(worldPos.x) && isFinite(worldPos.y) && isFinite(worldPos.z)) {
+    //         center.add(worldPos);
+    //         validPieces++;
+    //       }
+    //     });
+    //     if (validPieces > 0) {
+    //       center.divideScalar(validPieces);
+    //       if (!isNaN(center.x) && !isNaN(center.y) && !isNaN(center.z) &&
+    //           isFinite(center.x) && isFinite(center.y) && isFinite(center.z)) {
+    //         centers.push(center);
+    //       }
+    //     }
+    //   });
+    //   lineArray.forEach(line => scene.remove(line));
+    //   lineArray.length = 0;
+    //   for (let i = 0; i < centers.length; i++) {
+    //     for (let j = i + 1; j < centers.length; j++) {
+    //       const center1 = centers[i];
+    //       const center2 = centers[j];
+    //       if (center1 && center2) {
+    //         const geometry = new LineGeometry();
+    //         const material = new LineMaterial({
+    //           color: getGroupColor(groupIndex),
+    //           transparent: true,
+    //           opacity: 1,
+    //           linewidth: 0.02,
+    //           worldUnits: true,
+    //           alphaToCoverage: true
+    //         });
+    //         const positions = [center1.x, center1.y, center1.z, center2.x, center2.y, center2.z];
+    //         geometry.setPositions(positions);
+    //         const line = new Line2(geometry, material);
+    //         scene.add(line);
+    //         lineArray.push(line);
+    //       }
+    //     }
+    //   }
+    // });
     
-    // ───── Inter-Group Lines (Grey) ─────
+    // ───── Inter-Group Lines (Pink) ─────
     // Clear existing inter-group lines
     interGroupLines.forEach(line => scene.remove(line));
     interGroupLines.length = 0;
