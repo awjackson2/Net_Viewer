@@ -821,7 +821,7 @@ export default function UnifiedViewer({ electrodeState }) {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span>3D Projection (Live)</span>
+          <span>3D Map</span>
           <button
             onClick={toggle3DProjectionFullscreen}
             style={{
@@ -921,7 +921,7 @@ export default function UnifiedViewer({ electrodeState }) {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span>JSON Reference (Interactive)</span>
+          <span>2D Map</span>
           <button
             onClick={toggleJsonReferenceFullscreen}
             style={{
